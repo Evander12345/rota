@@ -11,3 +11,4 @@ followed by
 
 ## Configuation
 Currently the configuration is rather complicated... I am trying to streamline this process currently.
+To get an idea on how to set up the server, checkout my [blog post](https://blog.evanolder.com/2020/04/30/creating-a-self-hosted-esp8266-esp32-over-the-air-programming-platform/)
