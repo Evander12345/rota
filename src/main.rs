@@ -12,7 +12,7 @@ use std::str;
 
 const ESPOTA_DIR_PATH: &str = "/root/espota/";
 
-
+// The main OTA function, responds to route /ota
 async fn ota(req: HttpRequest) -> impl Responder {
     let headers: &HeaderMap = &req.headers();
     // Before doing anything, authenticate the api key and device type.
@@ -59,16 +59,6 @@ async fn ota(req: HttpRequest) -> impl Responder {
         HttpResponse::NotModified().finish()
     }
 }
-// This function checks to see if the device is an ESP8266 or an ESP32.
-fn check_device_is_allowed(headers: &HeaderMap) -> bool {
-    match headers.get("x-esp8266-sta-mac") {
-        Some(_mac) => true,
-        _ => match headers.get("x-esp32-sta-mac") {
-            Some(_mac) => true,
-            _ => false,
-        }
-    }
-}
 // This function checks to see if the device is running an outdated version of the firmware.
 async fn check_for_firmware_update(req: HttpRequest) -> impl Responder {
     let headers = req.headers();
@@ -86,7 +76,7 @@ async fn check_for_firmware_update(req: HttpRequest) -> impl Responder {
         HttpResponse::Forbidden()
     }
 }
-// This function construct a path to the verion of the firmware the device is set to download in `espota/targets`.
+// This function constructs a path to the version of the firmware the device is set to download in `espota/targets`.
 fn construct_target_firmware_path_string(headers: &HeaderMap) -> String {
     // Extract mac address string from request.
     let mac_addr = extract_mac_addr_string(headers);
@@ -198,6 +188,16 @@ fn validate_api_key(headers: &HeaderMap) -> bool {
         lines.any(|elem| elem == validating_key)
     } else {
         panic!("Error finding api_keys");
+    }
+}
+// This function checks to see if the device is an ESP8266 or an ESP32.
+fn check_device_is_allowed(headers: &HeaderMap) -> bool {
+    match headers.get("x-esp8266-sta-mac") {
+        Some(_mac) => true,
+        _ => match headers.get("x-esp32-sta-mac") {
+            Some(_mac) => true,
+            _ => false,
+        }
     }
 }
 // This function extracts the currently running version from headers as a `chrono::DateTime<Utc>`.
