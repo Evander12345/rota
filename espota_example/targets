@@ -1,0 +1,5 @@
+Format the targets file as a CSV but without colons at the end of the row, so column one is ESP station mac address and column two is the target firmware name stripped of extension.
+BEGIN EXAMPLE FILE
+AA:BB:CC:DD:EE:FF, espota/my_firmware
+BB:CC:DD:EE:FF:AA, espota/my_other_firmware
+CC:DD:EE:FF:AA:BB, espota/firmware_z

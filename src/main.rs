@@ -10,8 +10,8 @@ use actix_web::http::{StatusCode, HeaderMap};
 use std::io::{Read};
 use std::str;
 
+// This constant is a string of the path to your espota directory, which should contain the `api_keys` and `targets` files, as well as any binaries and compile time files.
 const ESPOTA_DIR_PATH: &str = "/root/espota/";
-
 // The main OTA function, responds to route /ota
 async fn ota(req: HttpRequest) -> impl Responder {
     let headers: &HeaderMap = &req.headers();
@@ -227,7 +227,6 @@ fn extract_version_from_version_str(req_string: &str) -> DateTime<Utc> {
     let second: u32 = req_string[18..20].parse().unwrap();
     Utc.ymd(year, month, day).and_hms(hour, minute, second)
 }
-
 #[actix_rt::main]
 async fn main() -> io::Result<()> {
     // Values used to set the listening address and port of the Actix-Web Server
