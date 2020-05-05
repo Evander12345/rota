@@ -14,20 +14,34 @@ use std::str;
 const ESPOTA_DIR_PATH: &str = "/root/espota/";
 // The main OTA function, responds to route /ota
 async fn ota(req: HttpRequest) -> impl Responder {
+    // Get the headers from the request.
     let headers: &HeaderMap = &req.headers();
     // Before doing anything, authenticate the api key and device type.
     if !check_device_is_allowed(&headers) {
-        // Device is not allowed, send 403 Forbidden.
+        // Device is not allowed, send 403 Forbidden. Print IP if it exists. Fail2ban?
+        match headers.get("x-real-ip") {
+            Some(ip) => println!("Device with IP {} rejected.", ip.to_str().unwrap()),
+            _ => {}
+        };
         return HttpResponse::Forbidden().finish()
     }
     if !validate_api_key(&headers) {
         // API key not recognized, send 401 Unauthorized.
+        match headers.get("x-real-ip") {
+            Some(ip) => println!("Device with IP {} failed to authenticate.", ip.to_str().unwrap()),
+            _ => {}
+        };
         return HttpResponse::Unauthorized().finish()
     }
     // Handle OTA request if client bears key and is esp32/8266
     let mac_addr = extract_mac_addr_string(headers);
     let firmware_version_str = extract_firmware_string(headers);
     println!("Device ID {} validated with api key.", mac_addr);
+    // Warn if device is sending API key over an unencrypted HTTP connection, if the header is found that is.
+    match client_using_https(&headers) {
+        false => println!("WARNING: Client {} is sending API key over an unencrypted HTTP request.", mac_addr),
+        _ => {}
+    };
     let firmware_version = extract_version_from_version_str(firmware_version_str.as_str());
     // If the headers contain the version number then continue parsing update...
     if firmware_version.timestamp() < get_latest_firmware_date(headers).timestamp() {
@@ -35,10 +49,10 @@ async fn ota(req: HttpRequest) -> impl Responder {
         if let Ok(mut f) = std::fs::File::open(std::path::Path::new(format!("{}.ino.bin", construct_target_firmware_path_string(headers)).as_str())) {
             match f.read_to_end(buffer.as_mut()) {
                 Ok(_) => {},
-                Err(e) => panic!("Error reading file, {}", e)
+                Err(e) => panic!("Error reading binary file file, {}", e)
             }
         } else {
-            panic!("Not accepted.");
+            panic!("Error opening binary file.");
         }
         match headers.get("x-esp8266-sta-mac") {
             Some(mac) => println!("Sending firmware dated {} to ESP8266 {} running firmware dated {}", get_latest_firmware_date(headers), mac.clone().to_str().unwrap(), firmware_version),
@@ -57,6 +71,16 @@ async fn ota(req: HttpRequest) -> impl Responder {
             }
         }
         HttpResponse::NotModified().finish()
+    }
+}
+// This function parses the `x-frowarded-proto` header to determine http protocol of client. Returns true for HTTPS, false for HTTP.
+fn client_using_https(headers: &HeaderMap) -> bool {
+    match headers.get("x-forwarded-proto") {
+        Some(val) => match val.to_str().unwrap() {
+            "https" => true,
+            _ => false
+        }
+        _ => false // Assume worst case if we cannot tell.
     }
 }
 // This function checks to see if the device is running an outdated version of the firmware.
