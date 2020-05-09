@@ -24,7 +24,6 @@ struct EspDevice {
     device_alias: String,
     target_firmware: String
 }
-
 // This function generates a string representing the path to the configuration file.
 fn get_config_path() -> String {
     let mut path = match dirs::config_dir() {
@@ -266,7 +265,7 @@ fn save_settings(to_save: EspDevice) {
         Err(e) => panic!("Error saving configuration, {}", e)
     }
 }
-// Attempts to save the configuration into a file.
+// This function attempts to save the configuration into a file.
 fn try_save(configuration: std::vec::Vec<EspDevice>) -> std::io::Result<()>{
     let mut path = match dirs::home_dir() {
         Some(buf) => buf,
@@ -305,7 +304,7 @@ fn bundle_devices(devices: std::vec::Vec<EspDevice>) -> EspDevice {
         target_firmware,
     }
 }
-// Load settings config file into a `Vec<espDevices>`
+// This function loads settings config file into a `Vec<espDevices>`
 fn load_deice_config() -> Result<std::vec::Vec<EspDevice>, Box<dyn Error>> {
     let mut settings = Config::new();
     let mut path = match dirs::home_dir() {
@@ -333,7 +332,7 @@ fn load_deice_config() -> Result<std::vec::Vec<EspDevice>, Box<dyn Error>> {
 
     Ok(r_devices)
 }
-// Converts a vec<str> to a vec<String>
+// This function converts a vec<str> to a vec<String>
 fn to_string_vec(as_an_str: std::vec::Vec<&str>) -> std::vec::Vec<String>  {
     as_an_str.into_iter().map(|elem| String::from(elem)).collect()
 }
