@@ -30,7 +30,7 @@ fn get_config_path() -> String {
         Some(buf) => buf,
         _ => panic!("Error"),
     };
-    path.push(Path::new("rota/"));
+    path.push(Path::new("rota_example/"));
     String::from(path.to_str().unwrap())
 }
 // The main OTA function, handles route /ota
@@ -271,7 +271,7 @@ fn try_save(configuration: std::vec::Vec<EspDevice>) -> std::io::Result<()>{
         Some(buf) => buf,
         _ => panic!("Error getting home directory"),
     };
-    path.push(Path::new(".config/rota/devices.toml"));
+    path.push(Path::new(".config/rota_example/devices.toml"));
     // Create the config file. Destroys the old copy.
     let mut save_file = File::create(path)?;
     // Write bundled device values into the file...
@@ -312,7 +312,7 @@ fn load_deice_config() -> Result<std::vec::Vec<EspDevice>, Box<dyn Error>> {
         _ => panic!("Error"),
     };
 
-    path.push(Path::new(".config/rota/devices.toml"));
+    path.push(Path::new(".config/rota_example/devices.toml"));
     match settings.merge(config::File::from(path)) {
         Ok(_) => {},
         Err(e) => println!("Error merging configuration file {}", e)

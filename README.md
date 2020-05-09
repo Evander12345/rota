@@ -10,5 +10,5 @@ followed by
 `cargo install --path=rota`
 
 ## Configuation
-Currently the configuration is rather complicated... I am trying to streamline this process. Before running cargo install you should change the constant `ESPOTA_DIR_PATH` to point towards some directory, an example of this directory (espota_example) is included.
+Currently the configuration is rather complicated... I am trying to streamline this process.
 To get an idea on how to set up the server, checkout my [blog post](https://blog.evanolder.com/2020/04/30/creating-a-self-hosted-esp8266-esp32-over-the-air-programming-platform/).
