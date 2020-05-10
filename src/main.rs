@@ -30,7 +30,7 @@ fn get_config_path() -> String {
         Some(buf) => buf,
         _ => panic!("Error"),
     };
-    path.push(Path::new("rota_example/"));
+    path.push(Path::new("rota/"));
     String::from(path.to_str().unwrap())
 }
 // The main OTA function, handles route /ota
